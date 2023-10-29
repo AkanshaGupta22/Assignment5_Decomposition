@@ -1,0 +1,64 @@
+---
+title: "Decomposition_Assignment5"
+author: "Akansha Gupta"
+date: "2023-10-26"
+output: html_document
+---
+
+```{r}
+library(fpp)
+library(fpp2)
+
+library(readxl)
+coffeebrazil <- read_excel("C:/Users/ag2183/Desktop/coffeebrazil.xlsx")
+View(coffeebrazil)
+
+#time series conversion 
+
+TimeSeries<-ts(coffeebrazil$Import_value,start=c(2010,01),end=c(2022,06),frequency=12) 
+head(TimeSeries)
+plot(TimeSeries) 
+#This time series plot represents coffee import values from 2010 to 2022. Key observations include a noticeable increase in coffee imports over the years, suggestive of a long-term positive trend. Seasonal patterns are evident, with month-to-month variations reflecting factors like harvest seasons and market dynamics. Notably, the years 2020, 2021, and 2022 exhibit high variability, possibly indicating market volatility or changing industry dynamics.
+
+## The stl function is commonly used for decomposing time series data into its components: seasonal, trend, and remainder (or residual).s.window = "periodic" specifies that you want to use a periodic seasonal decomposition. This means the seasonal component is estimated as if the data repeats from year to year, which is suitable for time series with a yearly seasonal pattern.
+stl_decomp <- stl(TimeSeries,s.window ="periodic")
+
+plot(stl_decomp)
+#The seasonal component illustrates a clear cyclical pattern in coffee imports, with peaks and troughs repeating annually. The trend component demonstrates a consistent and positive long-term growth in coffee imports from 2010 to 2022. This suggests a steady increase in demand or market expansion over the observed period. The remainder component accounts for unexplained variations, representing the noise or short-term fluctuations in the data. Overall, this decomposition facilitates a nuanced understanding of coffee import dynamics, revealing both predictable seasonal patterns and a robust upward trend in import values.
+
+attributes(stl_decomp)
+
+
+# Lets print out a seasonal adjustment: The seasadj function is typically used to extract the seasonally adjusted component from a decomposed time series.
+seasadj(stl_decomp)
+
+# Plot a line on the graph
+plot(TimeSeries)
+#This line plots the original time series data on a graph. The original data represents coffee import values with seasonal patterns.
+
+#The seasonally adjusted data is plotted in red and shows the same time frame but with the seasonal component removed.
+lines(seasadj(stl_decomp), col="Red")
+#Insights drawn from the data reveal a significant seasonal component in coffee import values, with annual peaks and troughs, reflecting likely crop cycles and seasonal demand. The Seasonally Adjusted Data smooths these fluctuations, highlighting an overall upward trend in coffee imports over the years, potentially driven by increasing demand. This command overlays a red line on the Seasonally Adjusted Data, emphasizing the trend, showing how it consistently rises year after year. 
+
+
+# Default period forecast
+f_stl <- forecast(stl_decomp)
+
+#To create forecasts using the seasonal decomposition of the time series data with a horizon (h) of 15 periods.
+f_stl <- forecast(stl_decomp,h=15)
+f_stl
+plot(f_stl)
+#The plot displays forecasted values for a time series spanning 15 periods from July 2022 to September 2023. These forecasts are depicted by a solid blue line, encircled by shaded regions signifying 80% and 95% prediction intervals. The plot reveals temporal trends and variations in the forecasts, with increasingly wider prediction intervals as you project further into the future. Seasonal patterns, common in time series data, are apparent. This data offers valuable insights for decision-making, financial planning, and risk assessment, offering a range of likely outcomes. The forecasts show a growth trend with some seasonal fluctuations, and, as you extend into the future, the widening prediction intervals underscore the rising uncertainty in long-term projections. As we progress into 2023, the forecast suggests a generally upward trajectory while acknowledging some level of uncertainty through the prediction intervals, visually representing these forecasts and their associated uncertainties.
+
+# This command will decompose the timeSeries data into its components, which include the original time series, seasonal component, trend component, random component, and other relevant information
+decomp_elec <- decompose(TimeSeries)
+
+#The original data exhibits a clear seasonal pattern, with certain months showing higher values and others lower. Additionally, there is a noticeable increasing trend over the years. The seasonal component extracted from the data demonstrates that these seasonal patterns remain relatively consistent across the years, contributing to observed peaks and troughs. Simultaneously, the trend component highlights a steady upward trend, albeit with occasional fluctuations. The random component represents unexplained variations in the data, capturing irregular or unexpected deviations. This decomposition, characterized as additive, provides a comprehensive view of the underlying patterns and variations in the time series, which can be crucial for forecasting and decision-making.
+
+attributes(decomp_elec)
+seasadj(decomp_elec)
+#The seasonal decomposition of the coffee imports in Brazil dataset, using the provided command and results, reveals several key insights. The seasonally adjusted data showcases clear seasonality, with monthly fluctuations in coffee imports. Import values are consistently highest during the middle of each year, with peaks in June and July, while the lowest imports are observed at the beginning of each year. This decomposition helps in understanding the underlying trends, allowing analysts to focus on the non-seasonal patterns and potential contributing factors that affect coffee imports in Brazil over time. Furthermore, it highlights the significance of seasonality in this industry, potentially guiding decision-making for stakeholders involved in coffee trade and consumption.
+
+```
+
+
